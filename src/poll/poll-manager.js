@@ -78,12 +78,13 @@ async function handlePollUpload(request, env) {
 		return getResponseJson(400, 'Correct request body but \'votedFor\' was out of the bounds of the \'options\' array.');
 	}
 
-	let currentPollData = JSON.parse((await env.DB.prepare('SELECT JsonData FROM Polls WHERE PollName = ?').bind(current.pollName).first()).JsonData);
-
-	if (!currentPollData || !currentPollData.votes) {
-		currentPollData = {
-			votes: []
-		};
+	const row = await env.DB.prepare('SELECT JsonData FROM Polls WHERE PollName = ?').bind(current.pollName).first();
+	let currentPollData;
+	if (!row || !row.JsonData) {
+		currentPollData = {votes: []};
+	} else {
+		currentPollData = JSON.parse(row.JsonData);
+		if (!currentPollData.votes) currentPollData.votes = [];
 	}
 
 	currentPollData.votes.push(json.votedFor);
