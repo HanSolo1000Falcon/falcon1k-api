@@ -7,11 +7,19 @@
 	"name": "falcon1k-api",
 	"main": "src/index.js",
 	"compatibility_date": "2026-02-26",
+	"route": "api.falcon1k.dev/*",
 	"observability": {
 		"enabled": true
 	},
 	"compatibility_flags": [
 		"nodejs_compat"
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "api-db",
+			"database_id": "57f68a4d-44af-4687-a1ae-244fe0d198b4"
+		}
 	]
 	/**
 	 * Smart Placement
