@@ -1,12 +1,10 @@
 {
-	"poll-name": "Testing",
+	"pollName": "What type of pizza do you prefer?",
 	"options": [
-		"A",
-		"B",
-		"C",
-		"D",
-		"F",
-		"G",
-		"H"
+		"New York",
+		"Chicago deep dish",
+		"Neapolitan",
+		"Sicilian",
+		"New Haven"
 	]
 }

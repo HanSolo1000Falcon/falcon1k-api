@@ -1,3 +1,4 @@
+import { STATUS_CODES } from 'http';
 import { handlePollRequest } from './poll/poll-manager';
 
 export default {
@@ -9,17 +10,17 @@ export default {
 		}
 
 		if (url.pathname === '/' || !url.pathname) {
-			return getResponseJson(406, "NotAcceptable", "This is an API and is not meant to be used as a webpage.")
+			return getResponseJson(406, 'This is an API and is not meant to be used as a webpage.');
 		}
 
 		return notFound();
 	},
 };
 
-export function getResponseJson(status, message, detailed) {
+export function getResponseJson(status, detailed) {
 	return new Response(JSON.stringify({
 		status: status,
-		message: message,
+		message: STATUS_CODES[status],
 		detailed: detailed
 	}), {
 		status: status,
@@ -30,5 +31,5 @@ export function getResponseJson(status, message, detailed) {
 }
 
 export function notFound() {
-	return getResponseJson(404, "NotFound", "The requested URL was not found.");
+	return getResponseJson(404, "The requested URL was not found.");
 }
