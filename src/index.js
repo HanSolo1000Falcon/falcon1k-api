@@ -17,19 +17,28 @@ export default {
 	},
 };
 
-export function getResponseJson(status, detailed) {
-	return new Response(JSON.stringify({
-		status: status,
-		message: STATUS_CODES[status],
-		detailed: detailed
-	}), {
-		status: status,
-		headers: {
-			'Content-Type': 'application/json',
-		}
-	});
+export function getResponseJson(status, detailed, extraHeaders = {}) {
+	return new Response(
+		detailed === null
+			? null
+			: JSON.stringify({
+					status: status,
+					message: STATUS_CODES[status],
+					detailed: detailed,
+				}),
+		{
+			status: status,
+			headers: {
+				'Content-Type': 'application/json',
+				'Access-Control-Allow-Origin': '*',
+				'Access-Control-Allow-Methods': 'GET, OPTIONS',
+				'Access-Control-Allow-Headers': 'Content-Type',
+				...extraHeaders,
+			},
+		},
+	);
 }
 
 export function notFound() {
-	return getResponseJson(404, "The requested URL was not found.");
+	return getResponseJson(404, 'The requested URL was not found.');
 }

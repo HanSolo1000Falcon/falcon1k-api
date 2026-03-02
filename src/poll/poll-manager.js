@@ -1,12 +1,12 @@
 /*
-* Incredibly exploitable implementation letting basically anyone flood the database as much as they want.
-* But I trust that anyone reading this codebase is invested enough in my personal projects not to ruin it.
-*
-* If you feel the need to exploit this though, seriously? Why would you want to exploit this API I'm writing for fun
-* and intentionally making open source on GitHub so others can learn from my (subpar) code?
-*/
+ * Incredibly exploitable implementation letting basically anyone flood the database as much as they want.
+ * But I trust that anyone reading this codebase is invested enough in my personal projects not to ruin it.
+ *
+ * If you feel the need to exploit this though, seriously? Why would you want to exploit this API I'm writing for fun
+ * and intentionally making open source on GitHub so others can learn from my (subpar) code?
+ */
 
-import {getResponseJson, notFound} from '../index';
+import { getResponseJson, notFound } from '../index';
 import current from './current.json';
 
 export async function handlePollRequest(request, env) {
@@ -19,7 +19,10 @@ export async function handlePollRequest(request, env) {
 				status: 200,
 				headers: {
 					'Content-Type': 'application/json',
-				}
+					'Access-Control-Allow-Origin': '*',
+					'Access-Control-Allow-Methods': 'GET, OPTIONS',
+					'Access-Control-Allow-Headers': 'Content-Type',
+				},
 			});
 
 		case '/upload':
@@ -43,14 +46,17 @@ export async function handlePollRequest(request, env) {
 					}
 				}
 			} catch {
-				return getResponseJson(500, 'Couldn\'t find polls.');
+				return getResponseJson(500, "Couldn't find polls.");
 			}
 
 			return new Response(JSON.stringify(json), {
 				status: 200,
 				headers: {
 					'Content-Type': 'application/json',
-				}
+					'Access-Control-Allow-Origin': '*',
+					'Access-Control-Allow-Methods': 'GET, OPTIONS',
+					'Access-Control-Allow-Headers': 'Content-Type',
+				},
 			});
 	}
 
@@ -58,6 +64,12 @@ export async function handlePollRequest(request, env) {
 }
 
 async function handlePollUpload(request, env) {
+	if (request.method === 'OPTIONS') {
+		return getResponseJson(204, null, {
+			'Access-Control-Allow-Methods': 'POST, OPTIONS',
+		});
+	}
+
 	if (request.method !== 'POST') {
 		return getResponseJson(405, 'You can only send POST requests to this URL');
 	}
@@ -67,21 +79,21 @@ async function handlePollUpload(request, env) {
 	try {
 		json = await request.json();
 	} catch {
-		return getResponseJson(400, `Failed to read request body. (Expected something like ${JSON.stringify({votedFor: -1})})`);
+		return getResponseJson(400, `Failed to read request body. (Expected something like ${JSON.stringify({ votedFor: -1 })})`);
 	}
 
 	if (!json || typeof json.votedFor !== 'number') {
-		return getResponseJson(400, `Missing or malformed request body. (Expected something like ${JSON.stringify({votedFor: -1})})`);
+		return getResponseJson(400, `Missing or malformed request body. (Expected something like ${JSON.stringify({ votedFor: -1 })})`);
 	}
 
 	if (json.votedFor < 0 || json.votedFor >= current.options.length) {
-		return getResponseJson(400, 'Correct request body but \'votedFor\' was out of the bounds of the \'options\' array.');
+		return getResponseJson(400, "Correct request body but 'votedFor' was out of the bounds of the 'options' array.");
 	}
 
 	const row = await env.DB.prepare('SELECT JsonData FROM Polls WHERE PollName = ?').bind(current.pollName).first();
 	let currentPollData;
 	if (!row || !row.JsonData) {
-		currentPollData = {votes: []};
+		currentPollData = { votes: [] };
 	} else {
 		currentPollData = JSON.parse(row.JsonData);
 		if (!currentPollData.votes) {
@@ -90,7 +102,11 @@ async function handlePollUpload(request, env) {
 	}
 
 	currentPollData.votes.push(json.votedFor);
-	await env.DB.prepare('INSERT INTO Polls(PollName, JsonData) VALUES (?, ?) ON CONFLICT(PollName) DO UPDATE SET JsonData = excluded.JsonData').bind(current.pollName, JSON.stringify(currentPollData)).run();
+	await env.DB.prepare(
+		'INSERT INTO Polls(PollName, JsonData) VALUES (?, ?) ON CONFLICT(PollName) DO UPDATE SET JsonData = excluded.JsonData',
+	)
+		.bind(current.pollName, JSON.stringify(currentPollData))
+		.run();
 
 	return getResponseJson(200, 'Successfully voted.');
 }
