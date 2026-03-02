@@ -1,10 +1,12 @@
 {
-	"pollName": "What type of pizza do you prefer?",
+	"pollName": "What's the best continent?",
 	"options": [
-		"New York",
-		"Chicago deep dish",
-		"Neapolitan",
-		"Sicilian",
-		"New Haven"
+		"North America",
+		"South America",
+		"Europe",
+		"Africa",
+		"Asia",
+		"Oceania",
+		"Antarctica"
 	]
 }
