@@ -2,7 +2,7 @@ import { STATUS_CODES } from 'http';
 import { handlePollRequest } from './poll/poll-manager';
 
 export default {
-	async fetch(request, env, ctx) {
+	async fetch(request, env, ctx): Promise<Response> {
 		const url = new URL(request.url);
 
 		if (url.pathname.startsWith('/poll')) {
@@ -15,9 +15,9 @@ export default {
 
 		return notFound();
 	},
-};
+} satisfies ExportedHandler<Env>;
 
-export function getResponseJson(status, detailed, extraHeaders = {}) {
+export function getResponseJson(status: number, detailed: string | null, extraHeaders = {}) {
 	return new Response(
 		detailed === null
 			? null

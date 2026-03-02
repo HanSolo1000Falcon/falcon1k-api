@@ -1,12 +1,9 @@
 {
-	"pollName": "What's the best continent?",
+	"pollName": "What's your preferred language to write Cloudflare Workers in?",
 	"options": [
-		"North America",
-		"South America",
-		"Europe",
-		"Africa",
-		"Asia",
-		"Oceania",
-		"Antarctica"
+        "TypeScript",
+        "JavaScript",
+        "Rust",
+        "Python"
 	]
 }

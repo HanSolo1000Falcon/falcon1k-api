@@ -9,7 +9,7 @@
 import { getResponseJson, notFound } from '../index';
 import current from './current.json';
 
-export async function handlePollRequest(request, env) {
+export async function handlePollRequest(request: Request, env: Env) {
 	const url = new URL(request.url);
 	const pathname = url.pathname.replace('/poll', '');
 
@@ -29,12 +29,12 @@ export async function handlePollRequest(request, env) {
 			return await handlePollUpload(request, env);
 
 		case '/fetch':
-			const json = {};
+			const json: Record<string, JSON> = {};
 
 			// Wrapped this in a try catch because it used to throw when I forgot to await the D1 call.
 			// I'll keep the try catch though because it might throw again, who knows?
 			try {
-				const polls = await env.DB.prepare('SELECT * FROM Polls').all();
+				const polls: { results: { PollName: string; JsonData: string }[] } = await env.DB.prepare('SELECT * FROM Polls').all();
 
 				for (const row of polls.results) {
 					try {
@@ -63,7 +63,7 @@ export async function handlePollRequest(request, env) {
 	return notFound();
 }
 
-async function handlePollUpload(request, env) {
+async function handlePollUpload(request: Request, env: Env) {
 	if (request.method === 'OPTIONS') {
 		return getResponseJson(204, null, {
 			'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -74,23 +74,23 @@ async function handlePollUpload(request, env) {
 		return getResponseJson(405, 'You can only send POST requests to this URL');
 	}
 
-	let json;
+	let json: { votedFor: number } | null = null;
 
 	try {
 		json = await request.json();
-	} catch {
-		return getResponseJson(400, `Failed to read request body. (Expected something like ${JSON.stringify({ votedFor: -1 })})`);
+	} catch (e) {
+		return getResponseJson(400, `Failed to read request body. Make sure you are sending a valid JSON body. Error details: ${e}`);
 	}
 
 	if (!json || typeof json.votedFor !== 'number') {
-		return getResponseJson(400, `Missing or malformed request body. (Expected something like ${JSON.stringify({ votedFor: -1 })})`);
+		return getResponseJson(400, `Missing or malformed request body. Make sure you are sending a JSON body with a 'votedFor' property that is a number. Example: { "votedFor": 0 }`);
 	}
 
 	if (json.votedFor < 0 || json.votedFor >= current.options.length) {
 		return getResponseJson(400, "Correct request body but 'votedFor' was out of the bounds of the 'options' array.");
 	}
 
-	const row = await env.DB.prepare('SELECT JsonData FROM Polls WHERE PollName = ?').bind(current.pollName).first();
+	const row: { JsonData: string } | null = await env.DB.prepare('SELECT JsonData FROM Polls WHERE PollName = ?').bind(current.pollName).first();
 	let currentPollData;
 	if (!row || !row.JsonData) {
 		currentPollData = { votes: [] };
