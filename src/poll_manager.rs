@@ -38,11 +38,17 @@ pub async fn handle_poll_request(req: Request, env: Env) -> Result<Response> {
     let url: Url = req.url()?;
     let pathname: String = url.path().replace("/poll", "");
 
+    let mut headers: Headers = Headers::new();
+    headers.set("Content-Type", "application/json")?;
+    headers.set("Access-Control-Allow-Origin", "*")?;
+    headers.set("Access-Control-Allow-Methods", "GET, OPTIONS")?;
+    headers.set("Access-Control-Allow-Headers", "Content-Type")?;
+
     match pathname.as_str() {
         "/current" => {
             let current: Value = serde_json::from_str(POLL_JSON)
                 .map_err(|e| Error::RustError(format!("bad poll.json: {e}")))?;
-            Response::from_json(&current)
+            Ok(Response::from_json(&current)?.with_headers(headers))
         }
 
         "/upload" => handle_poll_upload(req, env).await,
@@ -66,7 +72,7 @@ pub async fn handle_poll_request(req: Request, env: Env) -> Result<Response> {
                 }
             }
 
-            Response::from_json(&Value::Object(out))
+            Ok(Response::from_json(&Value::Object(out))?.with_headers(headers))
         }
 
         _ => not_found(),
