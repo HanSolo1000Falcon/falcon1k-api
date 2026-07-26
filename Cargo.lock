@@ -107,6 +107,8 @@ name = "falcon1k-api"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "serde",
+ "serde_json",
  "tower-service",
  "worker",
  "worker-macros",

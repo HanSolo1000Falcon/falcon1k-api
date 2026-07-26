@@ -1,0 +1,8 @@
+{
+  "pollName": "Best Rust?",
+  "options": [
+    "The game!",
+    "The programming language!",
+    "The thing that happens when iron oxidizes!"
+  ]
+}

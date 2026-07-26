@@ -8,3 +8,8 @@ command = "cargo install -q \"worker-build@^0.8\" && worker-build --release"
 [[routes]]
 pattern = "api.falcon1k.dev/*"
 zone_name = "falcon1k.dev"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "api-db"
+database_id = "57f68a4d-44af-4687-a1ae-244fe0d198b4"
