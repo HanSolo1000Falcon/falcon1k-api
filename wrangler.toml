@@ -1,0 +1,10 @@
+name = "falcon1k-api"
+main = "build/index.js"
+compatibility_date = "2026-07-26"
+
+[build]
+command = "cargo install -q \"worker-build@^0.8\" && worker-build --release"
+
+[[routes]]
+pattern = "api.falcon1k.dev/*"
+zone_name = "falcon1k.dev"
