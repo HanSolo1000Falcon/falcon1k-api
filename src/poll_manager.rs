@@ -38,7 +38,7 @@ pub async fn handle_poll_request(req: Request, env: Env) -> Result<Response> {
     let url: Url = req.url()?;
     let pathname: String = url.path().replace("/poll", "");
 
-    let mut headers: Headers = Headers::new();
+    let headers: Headers = Headers::new();
     headers.set("Content-Type", "application/json")?;
     headers.set("Access-Control-Allow-Origin", "*")?;
     headers.set("Access-Control-Allow-Methods", "GET, OPTIONS")?;
